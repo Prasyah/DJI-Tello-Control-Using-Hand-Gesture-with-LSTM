@@ -11,12 +11,12 @@ hands = mp_hands.Hands(static_image_mode=False, max_num_hands=1, min_detection_c
 mp_drawing = mp.solutions.drawing_utils
 
 # Folder Dataset
-DATA_PATH = 'dataset_hand_gestures' 
+DATA_PATH = 'dataset_hand_gestures_1' 
 
-# Daftar Gestur untuk Kursi Roda
-gestures = ["Maju", "Mundur", "Kanan", "Kiri", "Atas", "Bawah", "Putar_kanan", "Putar_kiri"]
-num_sequences = 10  
-sequence_length = 20  # frame
+# Daftar Gestur untuk drone
+gestures = ["Start_End", "Maju", "Mundur", "Kanan", "Kiri", "Atas", "Bawah", "Putar_kanan", "Putar_kiri"]
+num_sequences = 15  
+sequence_length = 25  # frame
 
 # Membuat folder untuk menyimpan data
 def create_gesture_folders(data_path, gestures, num_sequences):
