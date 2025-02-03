@@ -1,0 +1,1 @@
+model\mlp_hand_pose_model_V2_accurate.pkl : ketidak-akurat-an pada deteksi ketika tangan menggenggam dan ketika kelingking di angkat pada pose maju
