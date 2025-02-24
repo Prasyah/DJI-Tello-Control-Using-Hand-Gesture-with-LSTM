@@ -1,17 +1,20 @@
 import cv2
 import mediapipe as mp
 import numpy as np
-import joblib
+import tensorflow as tf
 import time
+import sys
+sys.stdout.reconfigure(encoding='utf-8')
 
-# Load MLP model
-model_path = "model/mlp_hand_pose_model_V2_revised_V1.pkl"
-mlp_model = joblib.load(model_path)
+
+# Load CNN model
+model_path = "model/cnn3d_hand_pose_model_v2_75.h5"
+cnn_model = tf.keras.models.load_model(model_path)
 
 CONFIDENCE_THRESHOLD = 0.9
 
 # Gesture labels
-poses = ["Start_End", "Maju", "Mundur", "Kanan", "Kiri", "Atas", "Bawah", "Putar_kanan", "Putar_kiri", "Undefined"]
+gestures = ["Start_End", "Maju", "Mundur", "Kanan", "Kiri", "Atas", "Bawah", "Putar_kanan", "Putar_kiri", "Undefined"]
 
 # Initialize MediaPipe Hands
 mp_hands = mp.solutions.hands
@@ -19,17 +22,23 @@ hands = mp_hands.Hands(static_image_mode=False, max_num_hands=1, min_detection_c
 mp_drawing = mp.solutions.drawing_utils
 
 def process_hand_landmarks(hand_landmarks):
-    return np.array([[lm.x, lm.y, lm.z] for lm in hand_landmarks.landmark]).flatten()
+    return np.array([[lm.x, lm.y, lm.z] for lm in hand_landmarks.landmark]).reshape(1, 21, 3)
 
 def predict_pose(landmarks):
-    scaled_landmarks = landmarks.reshape(1, -1)
-    probabilities = mlp_model.predict_proba(scaled_landmarks)[0]
+    print("Expected model input shape:", cnn_model.input_shape)
+    print("Actual input shape:", landmarks.shape)
+
+    # Pastikan input model dalam format float32
+    landmarks = landmarks.astype(np.float32)
+    
+    probabilities = cnn_model.predict(landmarks)[0]
     max_prob = np.max(probabilities)
     predicted_class = np.argmax(probabilities)
-    return (poses[predicted_class], max_prob) if max_prob >= CONFIDENCE_THRESHOLD else ("Uncertain", max_prob)
+    return (gestures[predicted_class], max_prob) if max_prob >= CONFIDENCE_THRESHOLD else ("Undefined", max_prob)
 
-def run_mlp_model_on_camera():
-    cap = cv2.VideoCapture(1)
+
+def run_cnn_model_on_camera():
+    cap = cv2.VideoCapture(0)
     if not cap.isOpened():
         print("Error: Cannot open camera.")
         return
@@ -69,4 +78,4 @@ def run_mlp_model_on_camera():
     cv2.destroyAllWindows()
 
 # Run inference using camera
-run_mlp_model_on_camera()
+run_cnn_model_on_camera()
