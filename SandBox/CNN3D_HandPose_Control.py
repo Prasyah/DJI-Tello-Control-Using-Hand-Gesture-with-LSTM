@@ -4,6 +4,7 @@ import numpy as np
 import tensorflow as tf
 import sys
 import os
+import time
 
 # Load CNN model
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'model')))
@@ -15,6 +16,7 @@ gestures = ["Start_End", "Maju", "Mundur", "Kanan", "Kiri", "Atas", "Bawah", "Pu
 
 mp_hands = mp.solutions.hands
 hands = mp_hands.Hands(static_image_mode=False, max_num_hands=1, min_detection_confidence=0.5)
+mp_drawing = mp.solutions.drawing_utils
 
 cap = cv2.VideoCapture(0)
 if not cap.isOpened():
@@ -33,7 +35,7 @@ def get_gesture():
     frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
     results = hands.process(frame_rgb)
 
-    gesture_text = "No Hand Detected"
+    gesture_text = "Undefined"
     
     if results.multi_hand_landmarks:
         for hand_landmarks in results.multi_hand_landmarks:

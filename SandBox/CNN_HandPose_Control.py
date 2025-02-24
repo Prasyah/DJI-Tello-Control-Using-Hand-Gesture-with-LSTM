@@ -4,6 +4,7 @@ import cv2
 import mediapipe as mp
 import sys
 import os
+import time
 
 # Load Keras model
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'model')))
@@ -46,7 +47,7 @@ def get_gesture():
     frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
     results = hands.process(frame_rgb)
 
-    gesture_text = "No Hand Detected"
+    gesture_text = "Undefined"
     
     if results.multi_hand_landmarks:
         for hand_landmarks in results.multi_hand_landmarks:
